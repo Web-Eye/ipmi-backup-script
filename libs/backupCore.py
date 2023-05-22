@@ -18,6 +18,7 @@ import logging
 import logging.handlers
 
 from libs.common.BufferingSMTPHandler import BufferingSMTPHandler
+from libs.common.netTools import canPing
 
 
 class backupCore:
@@ -37,9 +38,46 @@ class backupCore:
 
         self._logger.addHandler(_log_handler)
 
-        _mail_handler = BufferingSMTPHandler('localhost', self._config['mail']['fromaddr'], [self._config['mail']['toaddr']], 'ipmi backup', 500)
+        _mail_handler = BufferingSMTPHandler('localhost', self._config['mail']['fromaddr'],
+                                             [self._config['mail']['toaddr']], 'ipmi backup', 500)
         _mail_handler.setLevel(logging.WARNING)
         self._logger.addHandler(_mail_handler)
 
     def run(self):
+        #         sudo mount *.*.*.*:/srv/nfs/data01 /mnt/tmp/fsbackup01/data01
+        #         sudo umount /mnt/tmp/fsbackup01/data01
+        #         sudo /usr/bin/rsnapshot -c /etc/rsnapshot.fsbackup01.conf manual
+        #
+        #         ipmitool -H *.*.*.* -U * -P * chassis power status
+        #         ipmitool -H *.*.*.* -U * -P * chassis power on
+        #         ipmitool -H *.*.*.* -U * -P * chassis power soft
+        #
+        #
+        #         script:
+        #         - check fsbackup is on
+        #               - turn it on
+        #               - wait 2m
+
+        #         - check fsbackup is on
+        #               - send mail
+        #               - exit
+        #
+        #         - mount nfs
+        #               - turn fsbackup off
+        #               - send mail
+        #               - exit
+        #
+        #          - run rsnapshot
+        #          - unmount
+        #          - send mail
+        #          - turn fsbackup01 off
+
+        server_ip = self._config['server']['host']
+
         self._logger.info('starting backup core...')
+        self._logger.debug(f'ping {server_ip}')
+        if not canPing(server_ip):
+            self._logger.info(f'server {server_ip} is down, try tp start it.')
+
+        else:
+            self._logger.debug(f'server {server_ip} is up.')

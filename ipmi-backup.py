@@ -114,7 +114,14 @@ def getConfig(args):
     if args.mail_toaddr:
         config['mail']['toaddr'] = args.mail_toaddr
 
+    if not config['log'].get('filename'):
+        config['log']['filename'] = getDefaultLogFile()
+
+    if not config['log'].get('level'):
+        config['log']['level'] = 'INFO'
+
     return config
+
 
 def validateConfig(config):
     if config is None:
@@ -197,6 +204,8 @@ def validateConfig(config):
         print("broken config (mail.toaddr)")
         return False
 
+    return True
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -232,8 +241,7 @@ def main():
     parser.add_argument('-sto', '--server-timeout',
                         dest='server_timeout',
                         metavar='timeout till server is up',
-                        type=int,
-                        default=120)
+                        type=int)
 
     parser.add_argument('-smp', '--server-mountpoint',
                         dest='server_mountpoint',
@@ -258,14 +266,12 @@ def main():
     parser.add_argument('-lf', '--log-file',
                         dest='log_file',
                         metavar='manual log file',
-                        default=getDefaultLogFile(),
                         type=str)
 
     parser.add_argument('-ll', '--log-level',
                         dest='log_level',
                         metavar='log level',
                         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
-                        default='INFO',
                         type=str)
 
     parser.add_argument('-mf', '--mail-fromaddr',
@@ -301,14 +307,5 @@ def main2():
         print(l)
 
 
-def main3():
-    import subprocess
-
-    host = 'google.de'
-    param = '-n' if sys.platform == "win32" else '-c'
-    command = ['ping', param, '1', host]
-    print(subprocess.call(command) == 0)
-
-
 if __name__ == '__main__':
-    main3()
+    main()
