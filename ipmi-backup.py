@@ -291,5 +291,24 @@ def main():
     b.run()
 
 
+def main2():
+    import subprocess
+
+    output = subprocess.run(['ipconfig.exe'], capture_output=True, text=True)
+    stout = output.stdout
+    s = stout.split(chr(10))
+    for l in s:
+        print(l)
+
+
+def main3():
+    import subprocess
+
+    host = 'google.de'
+    param = '-n' if sys.platform == "win32" else '-c'
+    command = ['ping', param, '1', host]
+    print(subprocess.call(command) == 0)
+
+
 if __name__ == '__main__':
-    main()
+    main3()
