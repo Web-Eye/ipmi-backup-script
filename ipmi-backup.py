@@ -19,6 +19,8 @@ import sys
 import os
 import argparse
 
+from libs.backupCore import backupCore
+
 
 def getDefaultConfigFile():
     if sys.platform == "linux" or sys.platform == "linux2":
@@ -76,8 +78,125 @@ def getConfig(args):
     if args.ipmi_host:
         config['ipmi']['host'] = args.ipmi_host
 
+    if args.ipmi_user:
+        config['ipmi']['user'] = args.ipmi_user
 
-    print(config)
+    if args.ipmi_pass:
+        config['ipmi']['password'] = args.ipmi_pass
+
+    if args.server_host:
+        config['server']['host'] = args.server_host
+
+    if args.server_timeout:
+        config['server']['timeout'] = args.server_timeout
+
+    if args.server_mountpoint:
+        config['server']['mountpoint'] = args.server_mountpoint
+
+    if args.client_mountpoint:
+        config['client']['mountpoint'] = args.client_mountpoint
+
+    if args.rsnapshot_script:
+        config['rsnapshot']['script'] = args.rsnapshot_script
+
+    if args.rsnapshot_command:
+        config['rsnapshot']['command'] = args.rsnapshot_command
+
+    if args.log_file:
+        config['log']['filename'] = args.log_file
+
+    if args.log_level:
+        config['log']['level'] = args.log_level
+
+    if args.mail_fromaddr:
+        config['mail']['fromaddr'] = args.mail_fromaddr
+
+    if args.mail_toaddr:
+        config['mail']['toaddr'] = args.mail_toaddr
+
+    return config
+
+def validateConfig(config):
+    if config is None:
+        print("broken config")
+        return False
+
+    if config.get('ipmi') is None:
+        print("broken config (ipmi)")
+        return False
+
+    if config.get('server') is None:
+        print("broken config (server)")
+        return False
+
+    if config.get('client') is None:
+        print("broken config (client)")
+        return False
+
+    if config.get('rsnapshot') is None:
+        print("broken config (rsnapshot)")
+        return False
+
+    if config.get('log') is None:
+        print("broken config (log)")
+        return False
+
+    if config.get('mail') is None:
+        print("broken config (mail)")
+        return False
+
+    if config['ipmi'].get('host') is None:
+        print("broken config (ipmi.host)")
+        return False
+
+    if config['ipmi'].get('user') is None:
+        print("broken config (ipmi.user)")
+        return False
+
+    if config['ipmi'].get('password') is None:
+        print("broken config (ipmi.password)")
+        return False
+
+    if config['server'].get('host') is None:
+        print("broken config (server.host)")
+        return False
+
+    if config['server'].get('timeout') is None:
+        print("broken config (server.timeout)")
+        return False
+
+    if config['server'].get('mountpoint') is None:
+        print("broken config (server.mountpoint)")
+        return False
+
+    if config['client'].get('mountpoint') is None:
+        print("broken config (client.mountpoint)")
+        return False
+
+    if config['rsnapshot'].get('script') is None:
+        print("broken config (rsnapshot.script)")
+        return False
+
+    if config['rsnapshot'].get('command') is None:
+        print("broken config (rsnapshot.command)")
+        return False
+
+    if config['log'].get('filename') is None:
+        print("broken config (log.filename)")
+        return False
+
+    if config['log'].get('level') is None:
+        print("broken config (log.level)")
+        return False
+
+    if config['mail'].get('fromaddr') is None:
+        print("broken config (mail.fromaddr)")
+        return False
+
+    if config['mail'].get('toaddr') is None:
+        print("broken config (mail.toaddr)")
+        return False
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -105,9 +224,9 @@ def main():
                         metavar='impi password',
                         type=str)
 
-    parser.add_argument('-sip ', '--server-ip',
-                        dest='server_ip',
-                        metavar='server ip',
+    parser.add_argument('-sh ', '--server-host',
+                        dest='server_host',
+                        metavar='server host',
                         type=str)
 
     parser.add_argument('-sto', '--server-timeout',
@@ -146,10 +265,11 @@ def main():
                         dest='log_level',
                         metavar='log level',
                         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
+                        default='INFO',
                         type=str)
 
     parser.add_argument('-mf', '--mail-fromaddr',
-                        dest='mail_addrfrom',
+                        dest='mail_fromaddr',
                         metavar='manual mail from address',
                         type=str)
 
@@ -164,6 +284,11 @@ def main():
         sys.exit()
 
     config = getConfig(args)
+    if not validateConfig(config):
+        sys.exit()
+
+    b = backupCore(config)
+    b.run()
 
 
 if __name__ == '__main__':
