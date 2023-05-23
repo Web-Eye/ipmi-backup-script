@@ -102,6 +102,9 @@ def getConfig(args):
     if args.rsnapshot_command:
         config['rsnapshot']['command'] = args.rsnapshot_command
 
+    if args.rsnapshot_rootfolder:
+        config['rsnapshot']['root_folder'] = args.rsnapshot_rootfolder
+
     if args.log_file:
         config['log']['filename'] = args.log_file
 
@@ -188,6 +191,10 @@ def validateConfig(config):
         print("broken config (rsnapshot.command)")
         return False
 
+    if config['rsnapshot'].get('root_folder') is None:
+        print("broken config (rsnapshot.root_folder)")
+        return False
+
     if config['log'].get('filename') is None:
         print("broken config (log.filename)")
         return False
@@ -261,6 +268,11 @@ def main():
     parser.add_argument('-rsc', '--rsnapshot-command',
                         dest='rsnapshot_command',
                         metavar='rsnapschot command',
+                        type=str)
+
+    parser.add_argument('-rsrf', '--rsnapshot-root-folder',
+                        dest='rsnapshot_rootfolder',
+                        metavar='rsnapschot root folder',
                         type=str)
 
     parser.add_argument('-lf', '--log-file',
