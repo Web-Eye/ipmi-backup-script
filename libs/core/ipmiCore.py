@@ -17,6 +17,7 @@
 
 import subprocess
 
+
 class ipmiCore:
 
     def __init__(self, host, username, password):
@@ -25,7 +26,8 @@ class ipmiCore:
         self._password = password
         self._baseCommand = ['ipmitool', '-H', self._host, '-U', self._username, '-P', self._password]
 
-    def _call(self, command):
+    @staticmethod
+    def _call(command):
         try:
             process = subprocess.run(command, capture_output=True, text=True)
             err = process.returncode
@@ -42,7 +44,7 @@ class ipmiCore:
         err, out = self._call(command)
 
         if err != 0:
-           return err, out
+            return err, out
         else:
             if out is not None:
                 line = out.split(chr(10))
@@ -63,10 +65,11 @@ class ipmiCore:
         else:
             if out is not None:
                 line = out.split(chr(10))
-                print(line[0])
                 if line is not None and len(line) > 0:
                     if line[0] == 'Chassis Power Control: Up/On':
                         return 0, 'on'
+                    elif line[0] == 'Chassis Power Control: Soft':
+                        return 0, 'soft'
                     elif line[0] == 'Chassis Power is off':
                         return 0, 'off'
 

@@ -46,7 +46,7 @@ def getHumanityDiskUsage(disk_usage):
         unit += 1
         disk_usage /= 1024
 
-    sdu = Decimal(disk_usage).quantize(Decimal('0.1'), decimal.ROUND_HALF_UP)
+    sdu = Decimal(disk_usage).quantize(Decimal('0.01'), decimal.ROUND_HALF_UP)
 
     sunit = {
         0: 'B',

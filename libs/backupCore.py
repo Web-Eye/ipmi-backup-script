@@ -97,11 +97,11 @@ class backupCore:
         hh, mm = divmod(mm, 60)
 
         if hh > 0 and mm > 0 and ss > 0:
-            return f'{hh} hours, {mm} minutes and {ss} seconds'
+            return f'{int(hh)} hours, {int(mm)} minutes and {int(ss)} seconds'
         elif mm > 0 and ss > 0:
-            return f'{mm} minutes and {ss} seconds'
+            return f'{int(mm)} minutes and {int(ss)} seconds'
         elif ss > 0:
-            return f'{ss} seconds'
+            return f'{int(ss)} seconds'
 
         return 'no time'
 
@@ -148,7 +148,7 @@ class backupCore:
                 self._logger.critical(f'Unable to start server {server_ip}')
                 self.shuttingDown(1)
 
-        self._logger.debug(f'server {server_ip} is up.')
+        self._logger.info(f'server {server_ip} is up.')
 
         server_mountpoint = self._config['server']['mountpoint']
         client_mountpoint = self._config['client']['mountpoint']
